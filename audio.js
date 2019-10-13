@@ -8,9 +8,6 @@ var analyzer
 var dataArray
 var bufferLength
 
-const WIDTH = 500;
-const HEIGHT = 100;
-
 function gotDevices(deviceInfos) {
   // Handles being called several times to update labels. Preserve values.
   const values = selectors.map(select => select.value);
@@ -45,7 +42,7 @@ function visualize(stream) {
 
   source.connect(analyzer);
 
-  analyzer.fftSize = 256;
+  analyzer.fftSize = 2048;
 
   bufferLength = analyzer.frequencyBinCount;
   dataArray = new Uint8Array(bufferLength);
@@ -57,17 +54,17 @@ function draw() {
   analyzer.getByteFrequencyData(dataArray);
 
   canvasCtx.fillStyle = 'rgb(200, 200, 200)';
-  canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-  var barWidth = (WIDTH / bufferLength) * 2.5;
+  var barWidth = (canvas.width / bufferLength) * 2.5;
   var barHeight;
   var x = 0;
 
   for(var i = 0; i < bufferLength; i++) {
-    barHeight = dataArray[i]/2;
+    barHeight = dataArray[i] * controller.height;
 
     canvasCtx.fillStyle = 'rgb(50,50,50)';
-    canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight);
+    canvasCtx.fillRect(x,canvas.height-barHeight/2,barWidth,barHeight);
 
     x += barWidth + 1;
   }
@@ -90,7 +87,34 @@ function start() {
   navigator.mediaDevices.getUserMedia(constraints).then(visualize);
 }
 
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+
+const dat = require('dat.gui');
+
+var DataController = function() {
+  this.height = 1;
+}
+
+var controller = new DataController();
+
+window.onload = function() {
+  var gui = new dat.GUI();
+  gui.add(controller, 'height', 0, 10);
+}
+
+
+// Things to do when this file is run
 startBtn.onclick = start;
 
 navigator.mediaDevices.enumerateDevices()
 .then(gotDevices);
+
+ // Register an event listener to call the resizeCanvas() function 
+ // each time the window is resized.
+ window.addEventListener('resize', resizeCanvas, false);
+ // Draw canvas border for the first time.
+ resizeCanvas();

@@ -12,14 +12,15 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true
     },
-    frame: false
+    frame: false,
+    useContentSize: true
   })
 
   // and load the index.html of the app.
   win.loadFile('index.html');
 
-  // Open the DevTools.
-  // win.webContents.openDevTools();
+  // Make the window cover the entire screen
+  // win.maximize();
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -32,8 +33,15 @@ function createWindow () {
 
 // Close window on ctrl-x
 app.on('ready', () => {
-  globalShortcut.register('CommandOrControl+C', () => {
+  globalShortcut.register('CommandOrControl+X', () => {
     app.exit()
+  })
+  globalShortcut.register('CmdOrCtrl+Y', () => {
+    // Open the DevTools.
+    win.webContents.openDevTools();
+  })
+  globalShortcut.register('CmdOrCtrl+F', () => {
+    win.setFullScreen(true);
   })
 })
 
