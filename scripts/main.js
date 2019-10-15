@@ -17,7 +17,7 @@ function createWindow () {
   })
 
   // and load the index.html of the app.
-  win.loadFile('index.html');
+  win.loadFile('../app/index.html');
 
   // Make the window cover the entire screen
   // win.maximize();
